@@ -4,6 +4,8 @@ include $(CLEAR_VARS)
 
 LOGLEVELS =
 
+LOGLEVEL = error
+
 # Loglevels
 ifeq ($(LOGLEVEL),error)
 	LOGLEVELS	+= ERROR
