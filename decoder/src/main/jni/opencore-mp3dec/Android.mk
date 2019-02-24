@@ -76,6 +76,8 @@ else
   LOCAL_CFLAGS :=  $(PV_CFLAGS)
 endif
 
+LOCAL_CPPFLAGS := -Wno-deprecated-register
+
 LOCAL_STATIC_LIBRARIES := 
 
 LOCAL_SHARED_LIBRARIES := 

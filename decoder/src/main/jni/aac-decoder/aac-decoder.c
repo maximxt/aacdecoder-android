@@ -24,6 +24,7 @@
 #include "aac-common.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 /****************************************************************************************************
  * STRUCTS
@@ -248,7 +249,7 @@ static unsigned char* aacd_prepare_buffer( AACDInfo *info, jbyteArray inBuf, jin
     if (info->bytesleft != 0) memcpy( info->buffer_block2, info->buffer, info->bytesleft );
 
     JNIEnv *env = info->env;
-    (*env)->GetByteArrayRegion( env, inBuf, inOff, inLen, info->buffer_block2 + info->bytesleft );
+    (*env)->GetByteArrayRegion( env, inBuf, inOff, inLen, (jbyte *)(info->buffer_block2 + info->bytesleft) );
 
     info->buffer = info->buffer_block;
     info->buffer_block = info->buffer_block2;
@@ -326,7 +327,7 @@ static void aacd_decode( AACDInfo *info, jshort *samples, jint outLen )
         // check if input buffer is filled:
         if (info->bytesleft <= info->frame_max_bytesconsumed)
         {
-            AACD_DEBUG("bytes left/consumed: %d/%d", info->bytesleft, info->frame_max_bytesconsumed);
+            AACD_DEBUG("bytes left/consumed: %ld/%ld", info->bytesleft, info->frame_max_bytesconsumed);
             AACD_TRACE("decode() reading input buffer" );
             aacd_read_buffer( info );
 
@@ -346,7 +347,7 @@ static void aacd_decode( AACDInfo *info, jshort *samples, jint outLen )
             if (!info->decoder->decode( info, info->buffer, info->bytesleft, samples, outLen )) break;
 
             AACD_WARN( "decode() failed to decode a frame" );
-            AACD_DEBUG( "decode() failed to decode a frame - frames=%d, consumed=%d, samples=%d, bytesleft=%d, frame_maxconsumed=%d, frame_samples=%d, outLen=%d", info->round_frames, info->round_bytesconsumed, info->round_samples, info->bytesleft, info->frame_max_bytesconsumed, info->frame_samples, outLen);
+            AACD_DEBUG( "decode() failed to decode a frame - frames=%ld, consumed=%ld, samples=%ld, bytesleft=%ld, frame_maxconsumed=%ld, frame_samples=%ld, outLen=%d", info->round_frames, info->round_bytesconsumed, info->round_samples, info->bytesleft, info->frame_max_bytesconsumed, info->frame_samples, outLen);
 
             if (info->bytesleft <= info->frame_max_bytesconsumed)
             {
@@ -397,7 +398,7 @@ static void aacd_decode( AACDInfo *info, jshort *samples, jint outLen )
     } 
     while (outLen >= info->frame_samples );
 
-    AACD_DEBUG( "decode() round - frames=%d, consumed=%d, samples=%d, bytesleft=%d, frame_maxconsumed=%d, frame_samples=%d, outLen=%d", info->round_frames, info->round_bytesconsumed, info->round_samples, info->bytesleft, info->frame_max_bytesconsumed, info->frame_samples, outLen);
+    AACD_DEBUG( "decode() round - frames=%ld, consumed=%ld, samples=%ld, bytesleft=%ld, frame_maxconsumed=%ld, frame_samples=%ld, outLen=%d", info->round_frames, info->round_bytesconsumed, info->round_samples, info->bytesleft, info->frame_max_bytesconsumed, info->frame_samples, outLen);
 }
 
 
@@ -451,7 +452,7 @@ JNIEXPORT jlong JNICALL Java_com_spoledge_aacdecoder_Decoder_nativeStart
     info->buffer = buffer + err;
     info->bytesleft = buffer_size - err;
 
-    AACD_DEBUG( "start() bytesleft=%d", info->bytesleft );
+    AACD_DEBUG( "start() bytesleft=%ld", info->bytesleft );
 
     aacd_start_info2java( info );
 

@@ -1,6 +1,6 @@
 mydir := $(call my-dir)
 
-opencore-top.dir=./android-opencore-20120628-patch-stereo
+opencore-top.dir=$(mydir)/android-opencore-20120628-patch-stereo
 jni.loglevel=info
 
 PV_TOP 		:=	$(opencore-top.dir)

@@ -5,3 +5,6 @@ decoder/build
 decoder/src/main/libs
 decoder/src/main/obj
 player/build
+.idea/workspace.xml
+decoder/.externalNativeBuild
+local.properties

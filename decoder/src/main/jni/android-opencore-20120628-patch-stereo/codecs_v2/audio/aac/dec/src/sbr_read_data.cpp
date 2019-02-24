@@ -233,7 +233,7 @@ SBR_ERROR sbr_read_data(SBRDECODER_DATA * self,
                     SbrChannel[0].syncState     = SBR_ACTIVE;
                 }
 
-                if ((SbrChannel[0].syncState == SBR_ACTIVE))
+                if (SbrChannel[0].syncState == SBR_ACTIVE)
                 {
                     sbr_err = sbr_get_sce(&(SbrChannel[0].frameData),
                                           &bitBuf
