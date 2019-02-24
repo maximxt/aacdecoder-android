@@ -212,10 +212,10 @@ public class IcyInputStream extends FilterInputStream {
      */
     protected void parseMetadata( String s ) {
         String[] kvs = s.split( ";" );
-
-        for (String kv : kvs) {
-            int n = kv.indexOf( '=' );
-            if (n < 1) continue;
+        try { // may be wrong string
+        	for (String kv : kvs) {
+                int n = kv.indexOf( '=' );
+                if (n < 1) continue;
 
             boolean isString = n + 1 < kv.length()
                                 && kv.charAt( kv.length() - 1) == '\''
@@ -227,8 +227,25 @@ public class IcyInputStream extends FilterInputStream {
                             n + 1 < kv.length() ?
                                 kv.substring( n+1 ) : "";
 
-            // yes - we should detect this earlier, but it will not be null in most cases:
-            if (playerCallback != null) playerCallback.playerMetadata( key, val );
+                // yes - we should detect this earlier, but it will not be null in most cases:
+                doMeta(key, val);
+            }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+
+    private void doMeta(String key, String value){
+        if (key!=null) { // got Shoutcast metadata
+            if (key.equalsIgnoreCase("StreamTitle")) {
+                String artist = value;
+                String track = "";
+                if (artist.indexOf(" - ", 0) != -1){
+                    track = artist.substring(artist.indexOf(" - ", 0)+3, artist.length());
+                    artist = artist.substring(0, artist.indexOf(" - ", 0));
+                }
+                if (playerCallback != null) playerCallback.playerMetadata(artist, track);
+            }
         }
     }
 

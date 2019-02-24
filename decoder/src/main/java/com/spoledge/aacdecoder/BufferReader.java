@@ -21,8 +21,8 @@ package com.spoledge.aacdecoder;
 
 import android.util.Log;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 
 /**
@@ -88,6 +88,7 @@ public class BufferReader implements Runnable {
 
     private InputStream is;
 
+    private PlayerCallback playerCallback;
 
     ////////////////////////////////////////////////////////////////////////////
     // Constructors
@@ -101,9 +102,10 @@ public class BufferReader implements Runnable {
      *
      * @param is the input stream
      */
-    public BufferReader( int capacity, InputStream is ) {
+    public BufferReader(int capacity, InputStream is, PlayerCallback playerCallback ) {
         this.capacity = capacity;
         this.is = is;
+        this.playerCallback = playerCallback;
 
         Log.d( LOG, "init(): capacity=" + capacity );
 
@@ -157,9 +159,10 @@ public class BufferReader implements Runnable {
                     if (n == -1) stopped = true;
                     else total += n;
                 }
-                catch (IOException e) {
+                catch (IOException | ArrayIndexOutOfBoundsException e) {
                     Log.e( LOG, "Exception when reading: " + e );
                     stopped = true;
+                    if (playerCallback != null) playerCallback.playerException(e);
                 }
             }
 
@@ -170,9 +173,9 @@ public class BufferReader implements Runnable {
                 int indexNew = (indexMine + 1) % buffers.length;
 
                 while (!stopped && indexNew == indexBlocked) {
-                    //Log.d( LOG, "run() waiting...." );
+//                    Log.d( LOG, "run() waiting...." );
                     try { wait(); } catch (InterruptedException e) {}
-                    //Log.d( LOG, "run() awaken" );
+//                    Log.d( LOG, "run() awaken" );
                 }
 
                 indexMine = indexNew;
@@ -210,9 +213,9 @@ public class BufferReader implements Runnable {
         int indexNew = (indexBlocked + 1) % buffers.length;
 
         while (!stopped && indexNew == indexMine) {
-            Log.d( LOG, "next() waiting...." );
+//            Log.d( LOG, "next() waiting...." );
             try { wait(); } catch (InterruptedException e) {}
-            Log.d( LOG, "next() awaken" );
+//            Log.d( LOG, "next() awaken" );
         }
 
         if (indexNew == indexMine) return null;
